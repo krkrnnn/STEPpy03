@@ -72,15 +72,20 @@ def preEvaluate(tokens):
                     answer = tokens[index]['number']*tokens[index+2]['number']
                 else:
                     answer = answer*tokens[index+2]['number']
-                print answer
-                print 'mul in'
+                #print answer
+                #print 'mul in'
                 if(index+2 > len(tokens) - 2):
                     t.append({'type': 'NUMBER', 'number': answer})
                 index = index + 2
             elif tokens[index + 1]['type'] == 'DIVISION':
-                #print 'div'
-                #print index
-                answer = tokens[index]['number']/tokens[index+2]['number']
+                if answer == 1:
+                    answer = tokens[index]['number']/tokens[index+2]['number']
+                else:
+                    answer = answer/tokens[index+2]['number']
+                #print answer
+                #print 'div in'
+                if(index+2 > len(tokens) - 2):
+                    t.append({'type': 'NUMBER', 'number': answer})
                 index = index + 2
             elif tokens[index + 1]['type'] == 'MINUS':
                 if answer != 1:
@@ -106,7 +111,7 @@ def preEvaluate(tokens):
     return t
 
 def evaluate(t):
-    print t
+    #print t
     answer = 0
     t.insert(0, {'type': 'PLUS'}) # Insert a dummy '+' token
     index = 1
@@ -116,8 +121,7 @@ def evaluate(t):
                 answer += t[index]['number']
             elif t[index - 1]['type'] == 'MINUS':
                 answer -= t[index]['number']
-            else:
-                print 'Invalid syntax'
+                
         index += 1
     return answer
 
