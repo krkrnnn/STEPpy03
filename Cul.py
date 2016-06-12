@@ -53,63 +53,63 @@ def tokenize(line):
             print 'Invalid character found: ' + line[index]
             exit(1)
         tokens.append(token)
+    #print tokens
     return tokens
 
 
 
-
-
-def evaluate(tokens):
-    answer = 0
-    answer1 = 0
-    tokens.insert(0, {'type': 'PLUS'}) # Insert a dummy '+' token
-    index = 1
-
-    #array which is finished * and /
+def preEvaluate(tokens):
     t = []
-    t.insert(0, {'type': 'PLUS'}) # Insert a dummy '+' t
-    tindex = 1
-
-    while index < len(tokens):
-        print 'roooop'
+    index = 0
+    if len(tokens) == 1:
+        return tokens
+    while index < len(tokens) - 2:
+        #print 'while in'
         if tokens[index]['type'] == 'NUMBER':
-            if tokens[index - 1]['type'] == 'MULTIPLY':
-                answer1 *= tokens[index]['number']
-                t[tindex] = answer1
-                t[tindex]['type'] = 'NUMBER'
-            elif tokens[index - 1]['type'] == 'DIVISION':
-                answer1 /= tokens[index]['number']
-                t[tindex] = answer1
-                t[tindex]['type'] = 'NUMBER'
-            elif tokens[index - 1]['type'] == 'PLUS':
-                (tok, index) = readPlus(tokens[index - 1], index)
-                t.append(tok)
-                t.append(tokens[index])
-            elif tokens[index - 1]['type'] == 'MINUS':
-                (tok, index) = readPlus(tokens[index - 1], index)
-                t.append(tok)
-                t.append(tokens[index])
+            if tokens[index + 1]['type'] == 'MULTIPLY':
+                answer = tokens[index]['number']*tokens[index+2]['number']
+                # add answer to t[]
+                t.append({'type': 'NUMBER', 'number': answer})
+                index = index + 2
+            elif tokens[index + 1]['type'] == 'DIVISION':
+                print 'div'
+                print index
+                answer = tokens[index]['number']/tokens[index+2]['number']
+                # add answer to t[]
+                t.append({'type': 'NUMBER', 'number': answer})
+                index = index + 2
+            elif tokens[index + 1]['type'] == 'MINUS':
+                t.append({'type' : 'NUMBER', 'number': tokens[index]['number']})
+                t.append({'type': 'MINUS'})
+                index = index + 2
+            elif tokens[index + 1]['type'] == 'PLUS':
+                #print 'plusok'
+                t.append({'type' : 'NUMBER', 'number': tokens[index]['number']})
+                t.append({'type': 'PLUS'})
+               
+                index = index + 2
             else:
+                print 'pre Invalid syntax'
                 
+    t.append({'type' : 'NUMBER', 'number' : tokens[len(tokens)-1]['number']})    
+    return t
+
+def evaluate(t):
+    print t
+    answer = 0
+    t.insert(0, {'type': 'PLUS'}) # Insert a dummy '+' token
+    index = 1
+    while index < len(t):
+        if t[index]['type'] == 'NUMBER':
+            if t[index - 1]['type'] == 'PLUS':
+                answer += t[index]['number']
+            elif t[index - 1]['type'] == 'MINUS':
+                answer -= t[index]['number']
+            else:
                 print 'Invalid syntax'
         index += 1
-        tindex += 1
-        
-
-    print t
-    tindex = 1
-    index = 1
-
-    while tindex < len(t):
-        if t[tindex]['type'] == 'NUMBER':
-            if t[tindex - 1]['type'] == 'PLUS':
-                answer += t[tindex]['number']
-            elif t[tindex - 1]['type'] == 'MINUS':
-                answer -= t[tindex]['number']
-            else:
-                print 'Invalid syntax'
-        tindex += 1
     return answer
+
 
 
 
@@ -117,5 +117,6 @@ while True:
     print '> ',
     line = raw_input()
     tokens = tokenize(line)
-    answer = evaluate(tokens)
+    t = preEvaluate(tokens)
+    answer = evaluate(t)
     print "answer = %f\n" % answer
