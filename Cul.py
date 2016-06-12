@@ -71,40 +71,44 @@ def evaluate(tokens):
     tindex = 1
 
     while index < len(tokens):
+        print 'roooop'
         if tokens[index]['type'] == 'NUMBER':
             if tokens[index - 1]['type'] == 'MULTIPLY':
                 answer1 *= tokens[index]['number']
                 t[tindex] = answer1
                 t[tindex]['type'] = 'NUMBER'
-                tindex += 1
             elif tokens[index - 1]['type'] == 'DIVISION':
                 answer1 /= tokens[index]['number']
                 t[tindex] = answer1
                 t[tindex]['type'] = 'NUMBER'
-                tindex += 1
             elif tokens[index - 1]['type'] == 'PLUS':
-                t[tindex]['type'] = 'PLUS'
-                tindex += 1
+                (tok, index) = readPlus(tokens[index - 1], index)
+                t.append(tok)
+                t.append(tokens[index])
             elif tokens[index - 1]['type'] == 'MINUS':
-                t[tindex]['type'] = 'MINUS'
-                tindex += 1
+                (tok, index) = readPlus(tokens[index - 1], index)
+                t.append(tok)
+                t.append(tokens[index])
             else:
                 
                 print 'Invalid syntax'
         index += 1
+        tindex += 1
+        
 
-   
+    print t
     tindex = 1
+    index = 1
 
     while tindex < len(t):
-        if tokens[index]['type'] == 'NUMBER':
-            if tokens[index - 1]['type'] == 'PLUS':
-                answer += tokens[index]['number']
-            elif tokens[index - 1]['type'] == 'MINUS':
-                answer -= tokens[index]['number']
+        if t[tindex]['type'] == 'NUMBER':
+            if t[tindex - 1]['type'] == 'PLUS':
+                answer += t[tindex]['number']
+            elif t[tindex - 1]['type'] == 'MINUS':
+                answer -= t[tindex]['number']
             else:
                 print 'Invalid syntax'
-        index += 1
+        tindex += 1
     return answer
 
 
