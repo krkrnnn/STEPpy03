@@ -61,29 +61,40 @@ def tokenize(line):
 def preEvaluate(tokens):
     t = []
     index = 0
+    answer = 1
     if len(tokens) == 1:
         return tokens
     while index < len(tokens) - 2:
         #print 'while in'
         if tokens[index]['type'] == 'NUMBER':
             if tokens[index + 1]['type'] == 'MULTIPLY':
-                answer = tokens[index]['number']*tokens[index+2]['number']
-                # add answer to t[]
-                t.append({'type': 'NUMBER', 'number': answer})
+                if answer == 1:
+                    answer = tokens[index]['number']*tokens[index+2]['number']
+                else:
+                    answer = answer*tokens[index+2]['number']
+                print answer
+                print 'mul in'
+                if(index+2 > len(tokens) - 2):
+                    t.append({'type': 'NUMBER', 'number': answer})
                 index = index + 2
             elif tokens[index + 1]['type'] == 'DIVISION':
-                print 'div'
-                print index
+                #print 'div'
+                #print index
                 answer = tokens[index]['number']/tokens[index+2]['number']
-                # add answer to t[]
-                t.append({'type': 'NUMBER', 'number': answer})
                 index = index + 2
             elif tokens[index + 1]['type'] == 'MINUS':
+                if answer != 1:
+                    t.append({'type': 'NUMBER', 'number': answer})
+                    answer = 1
+
                 t.append({'type' : 'NUMBER', 'number': tokens[index]['number']})
                 t.append({'type': 'MINUS'})
                 index = index + 2
             elif tokens[index + 1]['type'] == 'PLUS':
-                #print 'plusok'
+                if answer != 1:
+                    t.append({'type': 'NUMBER', 'number': answer})
+                    answer = 1
+
                 t.append({'type' : 'NUMBER', 'number': tokens[index]['number']})
                 t.append({'type': 'PLUS'})
                
