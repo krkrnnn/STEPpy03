@@ -58,69 +58,54 @@ def tokenize(line):
 
 
 
-def preEvaluate(tokens):
-    t = []
+def evaluateMultiplyAndDivide(tokens):
+    tmp = []
     index = 0
     answer = 1
     if len(tokens) == 1:
         return tokens
-    while index < len(tokens) - 2:
+    if index == 0:
+        tmp.append({'type' : 'NUMBER', 'number': tokens[index]['number']})
+        index = index+1
+
+    while index < len(tokens):
         #print 'while in'
+        #print index
         if tokens[index]['type'] == 'NUMBER':
-            if tokens[index + 1]['type'] == 'MULTIPLY':
-                if answer == 1:
-                    answer = tokens[index]['number']*tokens[index+2]['number']
-                else:
-                    answer = answer*tokens[index+2]['number']
-                #print answer
-                #print 'mul in'
-                if(index+2 > len(tokens) - 2):
-                    t.append({'type': 'NUMBER', 'number': answer})
-                index = index + 2
-            elif tokens[index + 1]['type'] == 'DIVISION':
-                if answer == 1:
-                    answer = tokens[index]['number']/tokens[index+2]['number']
-                else:
-                    answer = answer/tokens[index+2]['number']
-                #print answer
-                #print 'div in'
-                if(index+2 > len(tokens) - 2):
-                    t.append({'type': 'NUMBER', 'number': answer})
-                index = index + 2
-            elif tokens[index + 1]['type'] == 'MINUS':
-                if answer != 1:
-                    t.append({'type': 'NUMBER', 'number': answer})
-                    answer = 1
-
-                t.append({'type' : 'NUMBER', 'number': tokens[index]['number']})
-                t.append({'type': 'MINUS'})
-                index = index + 2
-            elif tokens[index + 1]['type'] == 'PLUS':
-                if answer != 1:
-                    t.append({'type': 'NUMBER', 'number': answer})
-                    answer = 1
-
-                t.append({'type' : 'NUMBER', 'number': tokens[index]['number']})
-                t.append({'type': 'PLUS'})
-               
-                index = index + 2
+            if tokens[index - 1]['type'] == 'MULTIPLY':
+                lastnumber = tmp[len(tmp)-1]['number']
+                last = tmp.pop()
+                lastnumber *= tokens[index]['number']
+                tmp.append({'type' : 'NUMBER', 'number': lastnumber})
+            elif tokens[index - 1]['type'] == 'DIVISION':
+                lastnumber = t[len(t)-1]['number']
+                last = t.pop()
+                lastnumber /= tokens[index]['number']
+                tmp.append({'type' : 'NUMBER', 'number': lastnumber})
+            elif tokens[index - 1]['type'] == 'MINUS':
+                tmp.append({'type': 'MINUS'})
+                tmp.append({'type' : 'NUMBER', 'number': tokens[index]['number']})
+            elif tokens[index - 1]['type'] == 'PLUS':
+                tmp.append({'type': 'PLUS'})
+                tmp.append({'type' : 'NUMBER', 'number': tokens[index]['number']})
             else:
                 print 'pre Invalid syntax'
-                
-    t.append({'type' : 'NUMBER', 'number' : tokens[len(tokens)-1]['number']})    
-    return t
+               
+        index += 1 
+  
+    return tmp
 
-def evaluate(t):
-    #print t
+def evaluatePlusAndMinus(t):
+    tmp.insert(0, {'type': 'PLUS'}) # Insert a dummy '+' tmp
+    #print tmp
     answer = 0
-    t.insert(0, {'type': 'PLUS'}) # Insert a dummy '+' token
     index = 1
-    while index < len(t):
-        if t[index]['type'] == 'NUMBER':
-            if t[index - 1]['type'] == 'PLUS':
-                answer += t[index]['number']
-            elif t[index - 1]['type'] == 'MINUS':
-                answer -= t[index]['number']
+    while index < len(tmp):
+        if tmp[index]['type'] == 'NUMBER':
+            if tmp[index - 1]['type'] == 'PLUS':
+                answer += tmp[index]['number']
+            elif tmp[index - 1]['type'] == 'MINUS':
+                answer -= tmp[index]['number']
                 
         index += 1
     return answer
@@ -132,6 +117,6 @@ while True:
     print '> ',
     line = raw_input()
     tokens = tokenize(line)
-    t = preEvaluate(tokens)
-    answer = evaluate(t)
+    tmp = evaluateMultiplyAndDivide(tokens)
+    answer = evaluatePlusAndMinus(tmp)
     print "answer = %f\n" % answer
